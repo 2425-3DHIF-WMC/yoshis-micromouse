@@ -5,13 +5,30 @@ import React from "react";
 
 export default function Home() {
   return (
-      <div style={{
-        flex: 1,
-        height: "100%",
-        marginRight: "10px",
-        overflow: "hidden"
-      }}>
-          <Editor height="90vh" defaultLanguage="javascript" defaultValue="// some comment" />
+      <div style={
+          {
+              display: "flex",
+              flexDirection: "row",
+              height: "100%"
+          }
+      }>
+          <div style={{
+                flex: 1,
+                height: "100%",
+                marginRight: "10px",
+                overflow: "hidden"
+            }}>
+                <Editor height="90vh" defaultLanguage="typescript" defaultValue="// some comment" />
+            </div>
+            <div style={{
+                flex: 1,
+                height: "100%",
+                marginLeft: "10px",
+                overflow: "hidden",
+                gridRow: 16,
+                gridColumn: 16,
+            }}>
+            </div>
       </div>
   );
 }
