@@ -17,7 +17,7 @@ export default function Home() {
                 marginRight: "10px",
                 overflow: "hidden"
             }}>
-                <Editor height="90vh" defaultLanguage="typescript" defaultValue="// some comment" />
+                <Editor height="100vh" defaultLanguage="typescript" defaultValue="// some comment" />
             </div>
             <div style={{
                 flex: 1,
@@ -30,7 +30,7 @@ export default function Home() {
             </div>
             <div>
                 <button>
-                    Run Code
+                    ▶ Run Code
                 </button>
             </div>
         </div>
