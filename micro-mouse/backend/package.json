@@ -1,0 +1,32 @@
+{
+  "name": "backend-micromouse",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "server-dev": "npx nodemon app.ts",
+    "start": "npx ts-node app.ts"
+  },
+  "author": "zs.matyas",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.2",
+    "http-status-codes": "^2.2.0",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.4"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.10",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.5.0",
+    "typescript": "^5.7.3"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "public",
+      "**/*.json"
+    ]
+  }
+}
