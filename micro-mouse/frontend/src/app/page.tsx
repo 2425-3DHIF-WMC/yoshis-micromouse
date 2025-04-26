@@ -3,14 +3,16 @@
 import {Editor} from "@monaco-editor/react";
 import React, {useEffect, useRef, useState} from "react";
 import "./page.css";
+import * as fs from 'fs';
 
-const generateMaze = (rows: number, cols: number) => {
-    const maze = Array.from({ length: rows }, () => Array(cols).fill(0));
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < cols; j++) {
-            maze[i][j] = Math.random() > 0.5 ? 1 : 0;
-        }
-    }
+const readMaze = () => {
+    const files = ['maze00', 'maze01', 'maze02', 'maze03', 'maze04'];
+    const mazeFile = files[Math.floor(Math.random() * 5)];
+    const mazeText = fs.readFileSync(mazeFile, 'utf-8');
+    const maze: number[][] = mazeText
+        .trim()
+        .split('\n')
+        .map(line => line.trim().split('').map(Number));
     return maze;
 };
 
@@ -27,7 +29,6 @@ const drawMaze = (ctx: CanvasRenderingContext2D, maze: number[][], cellSize: num
 export default function Home() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [maze, setMaze] = useState<number[][]>([]);
-    const rows = 16;
     const cols = 16;
 
     useEffect(() => {
@@ -42,7 +43,7 @@ export default function Home() {
     }, [maze]);
 
     useEffect(() => {
-        setMaze(generateMaze(rows, cols));
+        setMaze(readMaze());
     }, []);
 
     return (
