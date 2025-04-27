@@ -3,12 +3,11 @@
 import {Editor} from "@monaco-editor/react";
 import React, {useEffect, useRef, useState} from "react";
 import "./page.css";
-import * as fs from 'fs';
+import mazes from "./mazes.json"
+
 
 const readMaze = () => {
-    const files = ['maze00', 'maze01', 'maze02', 'maze03', 'maze04'];
-    const mazeFile = files[Math.floor(Math.random() * 5)];
-    const mazeText = fs.readFileSync(mazeFile, 'utf-8');
+    const mazeText = mazes[Math.floor(Math.random() * mazes.length)];
     const maze: number[][] = mazeText
         .trim()
         .split('\n')
