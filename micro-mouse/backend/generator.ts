@@ -20,3 +20,8 @@ function neighborsAB(maze: number[][], a: number, b: number): number[][]{
     //TO_DO: Implement method for coordinate checking (NOT the same as the method "neighbors"
     return final;
 }
+
+function complete(maze: number[][]): boolean{
+    //TO_DO: Implement method for checking if the maze is "complete"
+    return true;
+}
