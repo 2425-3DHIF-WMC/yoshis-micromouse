@@ -23,6 +23,13 @@ function neighborsAB(maze: number[][], a: number, b: number): number[][]{
 
 function complete(maze: number[][]): boolean{
     //TO_DO: Implement method for checking if the maze is "complete"
+    for(let i: number = 1; i < maze.length; i+= 2){
+        for(let j: number = 1; j < maze.length; j+= 2){
+            if(maze[i][j] != 0){
+                return false;
+            }
+        }
+    }
     return true;
 }
 
