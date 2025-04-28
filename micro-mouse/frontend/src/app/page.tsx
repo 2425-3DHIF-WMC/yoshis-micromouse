@@ -29,15 +29,39 @@ export default function Home() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [maze, setMaze] = useState<number[][]>([]);
     const cols = 16;
+    const rows = 16;
+
+    const waitForEditor = (): Promise<HTMLElement> => {
+        return new Promise((resolve) => {
+            const checkEditor = () => {
+                const editorElement = document.querySelector(".monaco-editor");
+                if (editorElement) {
+                    resolve(editorElement as HTMLElement);
+                } else {
+                    setTimeout(checkEditor, 100);
+                }
+            };
+            checkEditor();
+        });
+    };
 
     useEffect(() => {
         const canvas = canvasRef.current;
         if (canvas) {
             const ctx = canvas.getContext("2d");
-            if (ctx) {
-                const cellSize = canvas.width / cols;
-                drawMaze(ctx, maze, cellSize);
-            }
+
+            waitForEditor().then(editorElement => {
+                if (ctx) {
+                    const { clientWidth, clientHeight } = editorElement;
+                    canvas.width = clientWidth;
+                    canvas.height = clientHeight;
+
+                    const cellSize = Math.min(clientWidth / cols, clientHeight / rows);
+                    drawMaze(ctx, maze, cellSize);
+                }
+            }).catch(error => {
+                console.error("Editor konnte nicht geladen werden:", error);
+            });
         }
     }, [maze]);
 
