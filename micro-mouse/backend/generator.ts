@@ -14,3 +14,9 @@ function neighbors(maze: number[][], a: number, b: number): number[][] {
     //TO_DO: Implement checker for the neighbors
     return final;
 }
+
+function neighborsAB(maze: number[][], a: number, b: number): number[][]{
+    let final: number[][] = [];
+    //TO_DO: Implement method for coordinate checking (NOT the same as the method "neighbors"
+    return final;
+}
