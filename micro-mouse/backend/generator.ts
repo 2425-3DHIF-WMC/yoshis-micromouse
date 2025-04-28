@@ -25,3 +25,8 @@ function complete(maze: number[][]): boolean{
     //TO_DO: Implement method for checking if the maze is "complete"
     return true;
 }
+
+function findCoordinate(maze: number[][]){
+    //TO_DO: Implement method for finding the coordinates for neighbors (basically where to go)
+    return maze;
+}
