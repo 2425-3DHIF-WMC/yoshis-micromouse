@@ -28,5 +28,18 @@ function complete(maze: number[][]): boolean{
 
 function findCoordinate(maze: number[][]){
     //TO_DO: Implement method for finding the coordinates for neighbors (basically where to go)
-    return maze;
+    for(let i: number = 1; i < maze.length; i+=2){
+        for(let j: number = 1; j < maze.length; j+=2){
+
+            if(maze[i][j] == 1){
+                const neighbor: number[][] = neighborsAB(maze, i, j);
+
+                for(let k: number = 0; k < neighborsAB.length; k++){
+                    if(maze[neighbor[k][0]][neighbor[k][1]] == 0){
+                        return [[i,j], neighbor[k]];
+                    }
+                }
+            }
+        }
+    }
 }
