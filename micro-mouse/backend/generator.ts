@@ -5,8 +5,38 @@ function huntAndKill(width: number, height: number) : number[][]{
     height -= height % 2;
     height++;
 
-    let maze: number[][] = [];
     //TO_DO: Implement Hunt & Kill algorithm
+    let maze: number[][] = [];
+    for(let i: number = 0; i < width; i++){
+        maze.push([])                                   //Add width
+        for(let j: number = 0; j < height; j++){
+            maze[i].push(1);                            //Fill with walls
+        }
+    }
+
+    maze[0][1] = 0;         //Opening (top)
+    maze[1][1   ] = 0;         //Exit (bottom)
+
+    let currentlyOn: number[] = [1,1];
+
+    while(!complete(maze)){
+        const neighbor = neighbors(maze, currentlyOn[0], currentlyOn[1]);
+        if(neighbor.length == 0){
+            const t: number[][] = findCoordinate(maze);
+            currentlyOn = t[0];
+
+            maze[currentlyOn[0]][currentlyOn[1]] = 0;
+            maze[(currentlyOn[0] + t[1][0]) / 2][(currentlyOn[1] + t[1][1]) / 2] = 0;
+        }
+        else{
+            let i: number = Math.floor(Math.random() * neighbor.length);
+            let nb: number[] = neighbor[i];
+            maze[nb[0]][nb[1]] = 0;
+            maze[(nb[0] + currentlyOn[0]) / 2][(nb[1] + currentlyOn[1]) / 2] = 0;
+
+            currentlyOn = nb.slice();
+        }
+    }
     return maze;
 }
 function neighbors(maze: number[][], a: number, b: number): number[][] {
@@ -56,7 +86,7 @@ function complete(maze: number[][]): boolean{
     return true;
 }
 
-function findCoordinate(maze: number[][]){
+function findCoordinate(maze: number[][]): number[][]{
     //TO_DO: Implement method for finding the coordinates for neighbors (basically where to go)
     for(let i: number = 1; i < maze.length; i+=2){
         for(let j: number = 1; j < maze.length; j+=2){
