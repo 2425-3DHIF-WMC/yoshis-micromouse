@@ -1,4 +1,4 @@
-function huntAndKill(width: number, height: number) : number[][]{
+export default function huntAndKill(width: number, height: number) : number[][]{
 
     width -= width % 2;
     width++;
@@ -15,7 +15,7 @@ function huntAndKill(width: number, height: number) : number[][]{
     }
 
     maze[0][1] = 0;         //Opening (top)
-    maze[1][1   ] = 0;         //Exit (bottom)
+    maze[1][1] = 0;         //Exit (bottom)
 
     let currentlyOn: number[] = [1,1];
 
@@ -86,19 +86,21 @@ function complete(maze: number[][]): boolean{
     return true;
 }
 
-function findCoordinate(maze: number[][]): number[][]{
-    //TO_DO: Implement method for finding the coordinates for neighbors (basically where to go)
-    for(let i: number = 1; i < maze.length; i+=2){
-        for(let j: number = 1; j < maze.length; j+=2){
-            if(maze[i][j] == 1){
+function findCoordinate(maze: number[][]): number[][] {
+    // Durchsuche das Labyrinth nach einem gültigen Koordinatenpaar
+    for (let i: number = 1; i < maze.length; i += 2) {
+        for (let j: number = 1; j < maze.length; j += 2) {
+            if (maze[i][j] == 1) {
                 const neighbor: number[][] = neighborsAB(maze, i, j);
 
-                for(let k: number = 0; k < neighborsAB.length; k++){
-                    if(maze[neighbor[k][0]][neighbor[k][1]] == 0){
-                        return [[i,j], neighbor[k]];
+                for (let k: number = 0; k < neighbor.length; k++) {
+                    if (maze[neighbor[k][0]][neighbor[k][1]] == 0) {
+                        return [[i, j], neighbor[k]];
                     }
                 }
             }
         }
     }
+
+    throw new Error("Keine gültigen Koordinaten gefunden");
 }

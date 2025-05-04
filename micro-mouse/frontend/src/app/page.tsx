@@ -1,73 +1,45 @@
+// In `micro-mouse/frontend/src/app/page.tsx`
 "use client";
 
-import {Editor} from "@monaco-editor/react";
-import React, {useEffect, useRef, useState} from "react";
+import { Editor } from "@monaco-editor/react";
+import React, { useEffect, useRef, useState } from "react";
 import "./page.css";
-import mazes from "./mazes.json"
-
-
-const readMaze = () => {
-    const mazeText = mazes[Math.floor(Math.random() * mazes.length)];
-    const maze: number[][] = mazeText
-        .trim()
-        .split('\n')
-        .map(line => line.trim().split('').map(Number));
-    return maze;
-};
 
 const drawMaze = (ctx: CanvasRenderingContext2D, maze: number[][], cellSize: number) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    for (let i = 0; i < maze.length; i++) {
-        for (let j = 0; j < maze[i].length; j++) {
-            ctx.fillStyle = maze[i][j] === 1 ? "#000" : "#fff";
+    maze.forEach((row, i) => {
+        row.forEach((cell, j) => {
+            ctx.fillStyle = cell === 1 ? "#fff" : "#000";
             ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
-        }
-    }
+        });
+    });
 };
 
 export default function Home() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [maze, setMaze] = useState<number[][]>([]);
-    const cols = 16;
-    const rows = 16;
+    const cols = 15;
+    const rows = 15;
 
-    const waitForEditor = (): Promise<HTMLElement> => {
-        return new Promise((resolve) => {
-            const checkEditor = () => {
-                const editorElement = document.querySelector(".monaco-editor");
-                if (editorElement) {
-                    resolve(editorElement as HTMLElement);
-                } else {
-                    setTimeout(checkEditor, 100);
-                }
-            };
-            checkEditor();
-        });
-    };
+    useEffect(() => {
+        const fetchMaze = async () => {
+            const response = await fetch(`http://localhost:3001/api/generate-maze?width=${cols}&height=${rows}`);
+            const data = await response.json();
+            setMaze(data);
+        };
+        fetchMaze();
+    }, []);
 
     useEffect(() => {
         const canvas = canvasRef.current;
-        if (canvas) {
+        if (canvas && maze.length > 0) {
             const ctx = canvas.getContext("2d");
-
-            waitForEditor().then(editorElement => {
-                if (ctx) {
-                    const { clientWidth, clientHeight } = editorElement;
-                    canvas.width = clientWidth;
-                    canvas.height = clientHeight;
-
-                    const cellSize = Math.min(clientWidth / cols, clientHeight / rows);
-                    drawMaze(ctx, maze, cellSize);
-                }
-            }).catch(error => {
-                console.error("Editor konnte nicht geladen werden:", error);
-            });
+            if (ctx) {
+                const cellSize = Math.min(canvas.width / cols, canvas.height / rows);
+                drawMaze(ctx, maze, cellSize);
+            }
         }
     }, [maze]);
-
-    useEffect(() => {
-        setMaze(readMaze());
-    }, []);
 
     return (
         <div style={{ display: "flex", flexDirection: "row", height: "98vh" }}>
@@ -75,8 +47,10 @@ export default function Home() {
                 <Editor height="100%" defaultLanguage="typescript" defaultValue="// some comment" />
             </div>
             <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
-                <canvas ref={canvasRef} width="100%" height="95%" />
-                <button style={{ height: "5%" }}>▶ Run Code</button>
+                <canvas ref={canvasRef} width={500} height={500} />
+                <button style={{ height: "5%" }} onClick={() => window.location.reload()}>
+                    Neues Labyrinth generieren
+                </button>
             </div>
         </div>
     );
