@@ -1,0 +1,21 @@
+.leaderboard-container {
+    text-align: center;
+    padding: 20px;
+}
+
+.leaderboard-table {
+    margin: 0 auto;
+    border-collapse: collapse;
+    width: 50%;
+}
+
+.leaderboard-table th,
+.leaderboard-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.leaderboard-table th {
+    background-color: #4CAF50;
+    color: white;
+}

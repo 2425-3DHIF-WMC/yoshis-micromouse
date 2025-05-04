@@ -4,6 +4,7 @@ import {Editor} from "@monaco-editor/react";
 import React, {useEffect, useRef, useState} from "react";
 import "./page.css";
 import mazes from "./mazes.json"
+import { useRouter } from "next/navigation";
 
 
 const readMaze = () => {
@@ -30,6 +31,7 @@ export default function Home() {
     const [maze, setMaze] = useState<number[][]>([]);
     const cols = 16;
     const rows = 16;
+    const router = useRouter();
 
     const waitForEditor = (): Promise<HTMLElement> => {
         return new Promise((resolve) => {
@@ -77,6 +79,9 @@ export default function Home() {
             <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
                 <canvas ref={canvasRef} width="100%" height="95%" />
                 <button style={{ height: "5%" }}>▶ Run Code</button>
+                <button style={{ height: "5%" }} onClick={() => router.push("/leaderboard")}>
+                    Zum Leaderboard
+                </button>
             </div>
         </div>
     );
