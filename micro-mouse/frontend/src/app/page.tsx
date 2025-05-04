@@ -2,7 +2,7 @@
 "use client";
 
 import { Editor } from "@monaco-editor/react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef} from "react";
 import "./page.css";
 import { useRouter } from "next/navigation";
 
@@ -18,30 +18,27 @@ const drawMaze = (ctx: CanvasRenderingContext2D, maze: number[][], cellSize: num
 
 export default function Home() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const [maze, setMaze] = useState<number[][]>([]);
     const cols = 15;
     const rows = 15;
     const router = useRouter();
 
-    useEffect(() => {
-        const fetchMaze = async () => {
-            const response = await fetch(`http://localhost:3001/api/generate-maze?width=${cols}&height=${rows}`);
-            const data = await response.json();
-            setMaze(data);
-        };
-        fetchMaze();
-    }, []);
+    const fetchAndDrawMaze = async () => {
+        const response = await fetch(`http://localhost:3001/api/generate-maze?width=${cols}&height=${rows}`);
+        const data = await response.json();
 
-    useEffect(() => {
         const canvas = canvasRef.current;
-        if (canvas && maze.length > 0) {
+        if (canvas) {
             const ctx = canvas.getContext("2d");
             if (ctx) {
                 const cellSize = Math.min(canvas.width / cols, canvas.height / rows);
-                drawMaze(ctx, maze, cellSize);
+                drawMaze(ctx, data, cellSize);
             }
         }
-    }, [maze]);
+    };
+
+    useEffect(() => {
+        fetchAndDrawMaze()
+    }, []);
 
     return (
         <div style={{ display: "flex", flexDirection: "row", height: "98vh" }}>
@@ -51,7 +48,7 @@ export default function Home() {
             <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
                 <canvas ref={canvasRef} width={500} height={500} />
                 <div style={{ flex: 1, display: "flex", flexDirection: "row", height: "100%", overflow: "hidden" }}>
-                    <button className="generateButton" onClick={() => window.location.reload()}>
+                    <button className="generateButton" onClick={fetchAndDrawMaze}>
                         Neues Labyrinth generieren
                     </button>
                     <button className="runButton">▶ Run Code</button>
