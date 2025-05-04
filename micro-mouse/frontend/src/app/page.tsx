@@ -1,4 +1,3 @@
-// In `micro-mouse/frontend/src/app/page.tsx`
 "use client";
 
 import { Editor } from "@monaco-editor/react";
