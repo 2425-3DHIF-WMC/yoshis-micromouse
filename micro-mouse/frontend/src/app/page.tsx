@@ -4,7 +4,6 @@
 import { Editor } from "@monaco-editor/react";
 import React, { useEffect, useRef, useState } from "react";
 import "./page.css";
-import mazes from "./mazes.json"
 import { useRouter } from "next/navigation";
 
 const drawMaze = (ctx: CanvasRenderingContext2D, maze: number[][], cellSize: number) => {
@@ -50,14 +49,16 @@ export default function Home() {
                 <Editor height="100%" defaultLanguage="typescript" defaultValue="// some comment" />
             </div>
             <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
-                <canvas ref={canvasRef} width="100%" height="95%" />
-                <button style={{ height: "5%" }} onClick={() => window.location.reload()}>
-                    Neues Labyrinth generieren
-                </button>
-                <button style={{ height: "5%" }}>▶ Run Code</button>
-                <button style={{ height: "5%" }} onClick={() => router.push("/leaderboard")}>
-                    Zum Leaderboard
-                </button>
+                <canvas ref={canvasRef} width={500} height={500} />
+                <div style={{ flex: 1, display: "flex", flexDirection: "row", height: "100%", overflow: "hidden" }}>
+                    <button className="generateButton" onClick={() => window.location.reload()}>
+                        Neues Labyrinth generieren
+                    </button>
+                    <button className="runButton">▶ Run Code</button>
+                    <button className="leaderboardButton" onClick={() => router.push("/leaderboard")}>
+                        Zum Leaderboard
+                    </button>
+                </div>
             </div>
         </div>
     );

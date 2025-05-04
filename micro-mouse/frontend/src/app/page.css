@@ -3,16 +3,36 @@ html {
 }
 
 button {
-    background-color: #4CAF50;
     color: white;
     border: none;
     cursor: pointer;
     width: 100%;
     border-radius: 4px;
+    font-size: 16px;
 }
 
-button:hover {
-  background-color: #169d19;
+.generateButton {
+    background-color: dodgerblue;
+}
+
+.generateButton:hover {
+    background-color: royalblue;
+}
+
+.runButton {
+    background-color: #4CAF50;
+}
+
+.runButton:hover {
+    background-color: #169d19;
+}
+
+.leaderboardButton {
+    background-color: red;
+}
+
+.leaderboardButton:hover {
+    background-color: darkred;
 }
 
 canvas {
