@@ -1,0 +1,76 @@
+(* --- Tokens --- *)
+
+identifier    = letter , { letter | digit | "_" } ;
+number        = integer | float ;
+integer       = digit , { digit } ;
+float         = digit , { digit } , "." , digit , { digit } ;
+bool_literal  = "true" | "false" ;
+type          = "int" | "float" | "bool" | "void" ;
+
+(* --- Program Structure --- *)
+
+program       = { function | statement } ;
+
+function      = "func" , type , identifier , "(" , [ parameters ] , ")" , block ;
+
+parameters    = parameter , { "," , parameter } ;
+parameter     = type , identifier ;
+
+block         = "{" , { statement } , "}" ;
+
+statement     = var_decl
+              | assignment
+              | if_stmt
+              | while_stmt
+              | return_stmt
+              | expr_stmt
+              | block
+              ;
+
+var_decl      = type , identifier , "=" , expression , ";" ;
+
+assignment    = identifier , "=" , expression , ";" ;
+
+if_stmt       = "if" , "(" , expression , ")" , block ;
+
+while_stmt    = "while" , "(" , expression , ")" , block ;
+
+return_stmt   = "return" , [ expression ] , ";" ;
+
+expr_stmt     = expression , ";" ;
+
+(* --- Expressions --- *)
+
+expression    = logic_or ;
+
+logic_or      = logic_and , { "||" , logic_and } ;
+logic_and     = equality , { "&&" , equality } ;
+equality      = comparison , { ("==" | "!=") , comparison } ;
+comparison    = term , { ("<" | "<=" | ">" | ">=") , term } ;
+term          = factor , { ("+" | "-") , factor } ;
+factor        = unary , { ("*" | "/" | "%") , unary } ;
+unary         = ("!" | "-") , unary | primary ;
+primary       = number
+              | bool_literal
+              | identifier
+              | function_call
+              | "(" , expression , ")" ;
+
+function_call = identifier , "(" , [ arguments ] , ")" ;
+arguments     = expression , { "," , expression } ;
+
+(* --- Built-in Commands --- *)
+
+builtin_call  = "move_forward" "(" ")" ";"
+              | "turn_left" "(" ")" ";"
+              | "turn_right" "(" ")" ";"
+              | "set_position" "(" , expression , "," , expression , ")" , ";"
+              | identifier , "=" , "get_x" "(" ")" , ";"
+              | identifier , "=" , "get_y" "(" ")" , ";"
+              | identifier , "=" , "get_angle" "(" ")" , ";" ;
+
+(* --- Lexical Elements --- *)
+
+letter        = "a" .. "z" | "A" .. "Z" ;
+digit         = "0" .. "9" ;
+

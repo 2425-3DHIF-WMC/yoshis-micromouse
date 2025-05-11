@@ -1,9 +1,0 @@
-letter := 'a' .. 'z' | 'A' .. 'Z'
-digit := '0' .. '9'
-whiteSpace := '' | '\t' | '\r' | '\n'
-
-ident := (letter | '_') { letter | digit | '_'}
-number := digit {digit}
-
-Keywords: 'fun' | 'if'  | 'else' | 'while' | 'return' | 'break' | 'continue' | 'void' | 'const' | 'let'
-Operators: '+' | '-' | '*' | '/' | '%' | '==' | '!=' | '>' | '>=' | '<' | '<=' | '&&' | '||' | '(' | ')' | '{' | '}' '=' | ';' | ','
