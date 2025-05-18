@@ -1,14 +1,33 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./page.css";
 
+interface IScore {
+    username: string;
+    score: string;
+}
+
 export default function Page() {
-    const mockData = [
-        { rank: 1, name: "Alice", score: 1200 },
-        { rank: 2, name: "Bob", score: 1100 },
-        { rank: 3, name: "Charlie", score: 1000 },
-    ];
+    const [leaderboardData, setLeaderboardData] = useState<IScore[]>([]);
+    const [currentUser, setCurrentUser] = useState("Unbekannt");
+
+    useEffect(() => {
+        const username = localStorage.getItem("username") || "Unbekannt";
+        setCurrentUser(username);
+
+        const fetchLeaderboard = async () => {
+            try {
+                const response = await fetch("http://localhost:3001/api/user/scores");
+                const data: IScore[] = await response.json();
+                setLeaderboardData(data);
+            } catch (error) {
+                console.error("Fehler beim Abrufen der Leaderboard-Daten:", error);
+            }
+        };
+
+        fetchLeaderboard();
+    }, []);
 
     return (
         <div className="leaderboard-container">
@@ -22,13 +41,34 @@ export default function Page() {
                 </tr>
                 </thead>
                 <tbody>
-                {mockData.map((entry) => (
-                    <tr key={entry.rank}>
-                        <td>{entry.rank}</td>
-                        <td>{entry.name}</td>
+                {leaderboardData.map((entry, index) => (
+                    <tr
+                        key={index}
+                        className={entry.username === currentUser ? "current-user" : ""}
+                    >
+                        <td>{index + 1}</td>
+                        <td>{entry.username}</td>
                         <td>{entry.score}</td>
                     </tr>
                 ))}
+                </tbody>
+            </table>
+            <table className="current-user-table">
+                <thead>
+                <tr>
+                    <th>Rang</th>
+                    <th>Name</th>
+                    <th>Punkte</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{leaderboardData.findIndex((entry) => entry.username === currentUser) + 1 || "-"}</td>
+                    <td>{currentUser}</td>
+                    <td>
+                        {leaderboardData.find((entry) => entry.username === currentUser)?.score || 0}
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>

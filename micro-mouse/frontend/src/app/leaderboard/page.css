@@ -1,6 +1,7 @@
 .leaderboard-container {
-    text-align: center;
-    padding: 20px;
+    position: relative;
+    min-height: 100vh;
+    padding-bottom: 50px;
 }
 
 .leaderboard-table {
@@ -18,4 +19,29 @@
 .leaderboard-table th {
     background-color: #4CAF50;
     color: white;
+}
+
+.current-user-table {
+    margin: 0 auto;
+    border-collapse: collapse;
+    width: 50%;
+    left: 25%;
+    position: fixed;
+    bottom: 0;
+}
+
+.current-user-table th,
+.current-user-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.current-user-table th {
+    background-color: dodgerblue;
+    color: white;
+}
+
+.current-user {
+    background-color: dodgerblue; /* Gelber Hintergrund */
+    font-weight: bold;
 }
