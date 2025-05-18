@@ -1,8 +1,8 @@
 import { Instruction, InstructionType } from "./Instruction";
 
 export class Vm {
-  private constantPool: number[];
-  private instructions: Instruction[];
+  private readonly constantPool: number[];
+  private readonly instructions: Instruction[];
 
   private stackPointer: number;
   private stack: number[];

@@ -1,3 +1,5 @@
+export type Type = "int" | "float" | "bool" | "void";
+
 export interface Node {
   type: string;
 }
@@ -19,7 +21,7 @@ export type Statement =
 
 export interface VarDeclaration extends Node {
   type: "VarDeclaration";
-  varType: string;
+  varType: Type;
   name: string;
   initializer: Expression;
 }
@@ -32,7 +34,7 @@ export interface Assignment extends Node {
 
 export interface FunctionDeclaration extends Node {
   type: "FunctionDeclaration";
-  returnType: string;
+  returnType: Type;
   name: string;
   params: Parameter[];
   body: BlockStatement;
@@ -40,7 +42,7 @@ export interface FunctionDeclaration extends Node {
 
 export interface Parameter {
   name: string;
-  paramType: string;
+  paramType: Type;
 }
 
 export interface IfStatement extends Node {

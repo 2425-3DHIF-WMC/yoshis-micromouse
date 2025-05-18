@@ -2,9 +2,10 @@ import {
   Token, TokenType,
 } from "./token";
 import * as AST from "./ast";
+import {Type} from "./ast";
 
 export class Parser {
-  private tokens: Token[];
+  private readonly tokens: Token[];
   private current = 0;
 
   constructor(tokens: Token[]) {
@@ -36,7 +37,7 @@ export class Parser {
   }
 
   private variableDeclaration(): AST.VarDeclaration {
-    const varType = this.advance().value;
+    const varType = this.consumeType();
     const name = this.consume(TokenType.Identifier, "Expected variable name").value;
     this.consume(TokenType.Operator, "Expected '='");
     const initializer = this.expression();
@@ -50,7 +51,6 @@ export class Parser {
   }
 
   private functionDeclaration(): AST.FunctionDeclaration {
-    this.consume("func");
     const returnType = this.consumeType();
     const name = this.consume(TokenType.Identifier, "Expected function name").value;
     this.consumeSymbol("(");
@@ -75,6 +75,7 @@ export class Parser {
       body,
     };
   }
+
   private statement(): AST.Statement {
     if (this.match("if")) return this.ifStatement();
     if (this.match("while")) return this.whileStatement();
@@ -280,12 +281,12 @@ export class Parser {
     throw new Error(`${errorMsg} at line ${this.peek().line}`);
   }
 
-  private consumeType(): string {
+  private consumeType(): Type {
     const token = this.consume(TokenType.Keyword, "Expected type keyword");
     if (!["int", "float", "bool", "void"].includes(token.value)) {
       throw new Error("Expected type keyword");
     }
-    return token.value;
+    return <"int" | "float" | "bool" | "void">token.value;
   }
 
   private consumeOperator(expected: string) {
