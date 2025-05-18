@@ -15,7 +15,7 @@ export default function huntAndKill(width: number, height: number) : number[][]{
     }
 
     maze[0][1] = 0;         //Opening (top)
-    maze[1][1] = 0;         //Exit (bottom)
+    maze[8][8] = 0;         //Exit (bottom)
 
     let currentlyOn: number[] = [1,1];
 

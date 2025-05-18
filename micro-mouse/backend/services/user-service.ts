@@ -1,6 +1,7 @@
 import {ServiceBase} from "./service-base";
 import {Unit} from "../unit";
 import * as bcrypt from "bcrypt";
+import {IScore, IUser} from "../model";
 
 export class UserService extends ServiceBase{
     constructor(unit: Unit) {
@@ -20,23 +21,35 @@ export class UserService extends ServiceBase{
         return [success, success ? null : "Registrierung fehlgeschlagen"];
     }
 
-    public async updateUserPassword(username: string, newPassword: string): Promise<boolean> {
-        const passwordHash = await bcrypt.hash(newPassword, 10);
-        const stmt = await this.unit.prepare(`
-            update Users set passwordHash = ? where username = ?`, [passwordHash, username]);
-        const [success, _] = await this.executeStmt(stmt);
-        return success;
-    }
-
-    public async deleteUser(username: string): Promise<boolean> {
-        const stmt = await this.unit.prepare('delete from Users where username = ?', username);
-        const [success, _] = await this.executeStmt(stmt);
-        return success;
-    }
-
-    public async getUser(username: string): Promise<any | null> {
+    public async getUser(username: string): Promise<IUser | null> {
         const stmt = await this.unit.prepare('select * from Users where username = ?', username);
         return ServiceBase.nullIfUndefined(await stmt.get());
+    }
+
+    public async getScores(): Promise<IScore[]> {
+        const stmt = await this.unit.prepare('select username, score from Users order by score desc, username');
+        const rows = await stmt.all();
+
+        return rows.map(row => {
+            const totalTime = row.score;
+            const minutes = Math.floor(totalTime / 60000);
+            const seconds = Math.floor((totalTime % 60000) / 1000);
+            const milliseconds = totalTime % 1000;
+
+            return {
+                username: row.username,
+                score: `${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`
+            }
+        });
+    }
+
+    public async updateScore(username: string, timeInMilliseconds: number): Promise<boolean> {
+        const stmt = await this.unit.prepare(
+            `UPDATE Users SET score = ? WHERE username = ?`,
+            [timeInMilliseconds, username]
+        );
+        const [success, _] = await this.executeStmt(stmt);
+        return success;
     }
 
     public async userExists(username: string): Promise<boolean> {

@@ -39,3 +39,17 @@ canvas {
     width: 100vh;
     height: 90vh;
 }
+
+.logout-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.logout-button:hover {
+    background-color: #d32f2f;
+}

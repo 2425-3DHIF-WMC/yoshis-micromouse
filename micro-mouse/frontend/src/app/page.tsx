@@ -19,8 +19,8 @@ const drawMaze = (ctx: CanvasRenderingContext2D, maze: number[][], cellSize: num
 export default function Home() {
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const cols = 15;
-    const rows = 15;
+    const cols = 31;
+    const rows = 31;
     const router = useRouter();
 
     const fetchAndDrawMaze = async () => {
@@ -37,11 +37,19 @@ export default function Home() {
         }
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        setIsLoggedIn(false);
+    };
+
     useEffect(() => {
-        if (isLoggedIn) {
-            fetchAndDrawMaze();
+        const token = localStorage.getItem("token");
+        if (token) {
+            setIsLoggedIn(true);
+        } else {
+            setIsLoggedIn(false);
         }
-    }, [isLoggedIn]);
+    }, []);
 
     return (
         <div>
@@ -49,6 +57,11 @@ export default function Home() {
                 <Login onLoginSuccess={() => setIsLoggedIn(true)} />
             ) : (
                 <div style={{ display: "flex", flexDirection: "row", height: "98vh" }}>
+                    <div style={{ position: "absolute", top: "10px", right: "10px" }}>
+                        <button onClick={handleLogout} className="logout-button">
+                            Logout
+                        </button>
+                    </div>
                     <div style={{ flex: 1, marginRight: "10px", overflow: "hidden" }}>
                         <Editor height="100%" defaultLanguage="typescript" defaultValue="// some comment" />
                     </div>
