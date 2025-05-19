@@ -15,7 +15,7 @@ export function huntAndKill(width: number, height: number): number[][] {
   }
 
   maze[0][1] = 0;         //Opening (top)
-  maze[16][16] = 0;        //Exit (none because micro mouse has to reach the middle)
+  maze[15][15] = 0;        //Exit (none because micro mouse has to reach the middle)
 
   let currentlyOn: number[] = [1, 1];
 
@@ -55,6 +55,8 @@ export function huntAndKill(width: number, height: number): number[][] {
   maze[16][14] = 1;
   maze[16][15] = 1;
   //maze[16][16] = 1;
+
+  maze[15][15] = 2;
 
   return maze;
 }
