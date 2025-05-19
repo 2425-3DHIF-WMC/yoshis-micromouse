@@ -1,4 +1,4 @@
-function huntAndKill(width: number, height: number): number[][] {
+export function huntAndKill(width: number, height: number): number[][] {
 
   width -= width % 2;
   width++;
@@ -121,4 +121,5 @@ function findCoordinate(maze: number[][]): number[][] {
       }
     }
   }
+    return [[-1, -1], [-1, -1]];
 }

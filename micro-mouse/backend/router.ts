@@ -1,5 +1,5 @@
 import { Router } from "express";
-import huntAndKill from "./generator";
+import { huntAndKill } from "./generator";
 
 const mazeRouter = Router();
 
