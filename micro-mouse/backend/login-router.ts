@@ -114,3 +114,31 @@ loginRouter.get('/scores', async (req, res) => {
         await unit.complete();
     }
 });
+
+loginRouter.post('/update-score', async (req, res) => {
+    const { username, timeInMilliseconds } = req.body;
+
+    if (!username || timeInMilliseconds === undefined) {
+        return res.status(StatusCodes.BAD_REQUEST).json({ error: "Benutzername und Zeit in Millisekunden sind erforderlich." });
+    }
+
+    const unit = await Unit.create(false);
+
+    try {
+        const service = new UserService(unit);
+        const success = await service.updateScore(username, timeInMilliseconds);
+
+        if (success) {
+            await unit.complete(true);
+            res.status(StatusCodes.OK).json({ message: "Score erfolgreich aktualisiert." });
+        } else {
+            await unit.complete(false);
+            res.status(StatusCodes.CONFLICT).json({ error: "Score wurde nicht aktualisiert." });
+        }
+    } catch (e) {
+        console.error(e);
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Ein Fehler ist aufgetreten." });
+    } finally {
+        await unit.complete(false);
+    }
+});

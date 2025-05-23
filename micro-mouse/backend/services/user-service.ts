@@ -44,11 +44,18 @@ export class UserService extends ServiceBase{
     }
 
     public async updateScore(username: string, timeInMilliseconds: number): Promise<boolean> {
-        const stmt = await this.unit.prepare(
+        const stmt = await this.unit.prepare('SELECT score FROM Users WHERE username = ?', username);
+        const currentScore = ServiceBase.unwrapSingle<number>(await stmt.get(), 'score');
+
+        if (currentScore !== null && currentScore <= timeInMilliseconds) {
+            return false;
+        }
+
+        const updateStmt = await this.unit.prepare(
             `UPDATE Users SET score = ? WHERE username = ?`,
             [timeInMilliseconds, username]
         );
-        const [success, _] = await this.executeStmt(stmt);
+        const [success, _] = await this.executeStmt(updateStmt);
         return success;
     }
 
