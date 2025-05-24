@@ -30,7 +30,7 @@ export class UserService extends ServiceBase {
     const stmt = await this.unit.prepare('select username, score from Users order by score desc, username');
     const rows = await stmt.all();
 
-    return rows.map(row => {
+    return rows.map((row: { score: any; username: any; }) => {
       const totalTime = row.score;
       const minutes = Math.floor(totalTime / 60000);
       const seconds = Math.floor((totalTime % 60000) / 1000);
