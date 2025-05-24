@@ -43,6 +43,8 @@ export function huntAndKill(width: number, height: number): number[][] {
   //[15,14][15,15][15,16]
   //[16,14][17,16][16,16]
 
+  maze[0][1] = 2;
+
   maze[14][14] = 0;
   maze[14][15] = 0;
   maze[14][16] = 0;
@@ -56,7 +58,7 @@ export function huntAndKill(width: number, height: number): number[][] {
   maze[16][15] = 1;
   //maze[16][16] = 1;
 
-  maze[15][15] = 2;
+  maze[15][15] = 3;
 
   return maze;
 }

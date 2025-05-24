@@ -11,7 +11,8 @@ const drawMaze = (ctx: CanvasRenderingContext2D, maze: number[][], cellSize: num
     maze.forEach((row, i) => {
         row.forEach((cell, j) => {
             ctx.fillStyle = cell === 1 ? "#fff" : "#000";
-            ctx.fillStyle = cell === 2 ? "#f00" : ctx.fillStyle;
+            ctx.fillStyle = cell === 2 ? "#00ff00" : ctx.fillStyle;
+            ctx.fillStyle = cell === 3 ? "#f00" : ctx.fillStyle;
             ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
         });
     });
