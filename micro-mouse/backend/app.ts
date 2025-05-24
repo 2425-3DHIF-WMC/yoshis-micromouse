@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
-import mazeRouter from "./router";
-import {loginRouter} from "./login-router";
+import mazeRouter from "./routers/generator_router";
+import { loginRouter } from "./routers/login-router";
 
 const app = express();
 
