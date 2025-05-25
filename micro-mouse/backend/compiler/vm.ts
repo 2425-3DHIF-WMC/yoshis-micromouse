@@ -21,13 +21,14 @@ export class VirtualMachine {
   private curPosition: Position = { x: 1, y: 0, dir_x: 0, dir_y: 1 };
   private readonly visitedPositions: Position[] = [];
   private readonly maze: number[][];
+  private readonly output: string[] = [];
 
   constructor(maze: number[][], bytecode: Instruction[]) {
     this.maze = maze;
     this.bytecode = bytecode;
   }
 
-  public run(): { steps: Position[], instruction_count: number } {
+  public run(): { steps: Position[], instruction_count: number, output: string } {
     this.stack = [];
     this.variables = new Map();
     this.functions = new Map();
@@ -50,7 +51,7 @@ export class VirtualMachine {
       const instr = this.bytecode[this.ip++];
       this.execute(instr);
     }
-    return { steps: this.visitedPositions, instruction_count: this.instructionCount };
+    return { steps: this.visitedPositions, instruction_count: this.instructionCount, output: "\n" + this.output.join("\n") };
   }
 
   private execute(instr: Instruction): void {
@@ -151,7 +152,7 @@ export class VirtualMachine {
     }
     if (name === "print") {
       const val = this.stack.pop();
-      console.log("Print:", val);
+      this.output.push("Print: " + val);
       return true;
     }
     if (name === "is_wall") {

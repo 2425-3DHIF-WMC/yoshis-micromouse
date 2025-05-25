@@ -1,4 +1,3 @@
-// src/app/page.tsx
 "use client";
 
 import { Editor } from "@monaco-editor/react";
@@ -18,6 +17,7 @@ interface Position {
 interface RunResult {
     steps: Position[];
     instruction_count: number;
+    output: string;
 }
 
 const drawMaze = (ctx: CanvasRenderingContext2D, maze: number[][], cellSize: number) => {
@@ -44,6 +44,8 @@ export default function Home() {
     const isRunningRef = useRef(isRunning);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [consoleOutput, setConsoleOutput] = useState<string>("Console output will appear here...");
+
 
     useEffect(() => {
         isRunningRef.current = isRunning;
@@ -73,9 +75,18 @@ export default function Home() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ code, maze: mazeData }),
             });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                setConsoleOutput(errorText);
+                return;
+            }
+
             const result = JSON.parse(await response.json()) as RunResult;
+            setConsoleOutput("Running program..." + result.output);
             setIsRunning(true);
             isRunningRef.current = true;
+
             if (result.steps.length > 0) {
                 autoStep(result,  1, mazeData!.map(x => x.slice()));
             }
@@ -267,7 +278,14 @@ export default function Home() {
                         </div>
                         <div className="card" id="maze-card">
                             <h2 style={{margin: "0 0 12px 0", color: "#2196f3", fontWeight: 600}}>Maze</h2>
-                            <canvas ref={canvasRef} width={500} height={500} />
+                            <div id="maze-container">
+                                <canvas ref={canvasRef} width={500} height={500} />
+                            </div>
+                            <div id="maze-console">
+                                <pre style={{ color: consoleOutput.includes('error') ? '#ff5858' : consoleOutput.startsWith('Running') ? '#43e97b' : '#a0aec0'  }}>
+                                    {consoleOutput}
+                                </pre>
+                            </div>
                         </div>
                     </div>
                 </div>
