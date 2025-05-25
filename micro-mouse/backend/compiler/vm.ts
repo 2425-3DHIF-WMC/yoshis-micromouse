@@ -130,7 +130,7 @@ export class VirtualMachine {
 
   private builtin(name: string): boolean {
     if (name === "move_forward") {
-      if (this.maze[this.curPosition.y + this.curPosition.dir_y][this.curPosition.x + this.curPosition.dir_x] === 0) {
+      if (this.maze[this.curPosition.y + this.curPosition.dir_y][this.curPosition.x + this.curPosition.dir_x] !== 1) {
         this.maze[this.curPosition.y][this.curPosition.x] = 0;
         this.curPosition = { x: this.curPosition.x + this.curPosition.dir_x, y: this.curPosition.y + this.curPosition.dir_y, dir_x: this.curPosition.dir_x, dir_y: this.curPosition.dir_y };
         this.visitedPositions.push(this.curPosition);
@@ -141,11 +141,11 @@ export class VirtualMachine {
       }
       return true;
     }
-    if (name === "turn_left") {
+    if (name === "turn_right") {
       this.curPosition = { x: this.curPosition.x, y: this.curPosition.y, dir_x: -this.curPosition.dir_y, dir_y: this.curPosition.dir_x };
       return true;
     }
-    if (name === "turn_right") {
+    if (name === "turn_left") {
       this.curPosition = { x: this.curPosition.x, y: this.curPosition.y, dir_x: this.curPosition.dir_y, dir_y: -this.curPosition.dir_x };
       return true;
     }
@@ -161,6 +161,22 @@ export class VirtualMachine {
       else {
         this.stack.push(0);
       }
+      return true;
+    }
+    if (name === "completed") {
+      if (this.maze[this.curPosition.y][this.curPosition.y] === 3) {
+        this.stack.push(1);
+      }
+      else {
+        this.stack.push(0);
+      }
+      return true;
+    }
+    if (name === "teleport") {
+      const x = this.stack.pop()!;
+      const y = this.stack.pop()!;
+      this.curPosition = { x: x, y: y, dir_x: this.curPosition.dir_x, dir_y: this.curPosition.dir_y };
+      this.visitedPositions.push(this.curPosition);
       return true;
     }
     return false;
