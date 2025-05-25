@@ -27,7 +27,7 @@ export class VirtualMachine {
     this.bytecode = bytecode;
   }
 
-  public run(): Position[] {
+  public run(): { steps: Position[], instruction_count: number } {
     this.stack = [];
     this.variables = new Map();
     this.functions = new Map();
@@ -50,7 +50,7 @@ export class VirtualMachine {
       const instr = this.bytecode[this.ip++];
       this.execute(instr);
     }
-    return this.visitedPositions;
+    return { steps: this.visitedPositions, instruction_count: this.instructionCount };
   }
 
   private execute(instr: Instruction): void {

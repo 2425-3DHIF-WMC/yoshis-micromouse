@@ -15,6 +15,11 @@ interface Position {
     dir_y: number;
 }
 
+interface RunResult {
+    steps: Position[];
+    instruction_count: number;
+}
+
 const drawMaze = (ctx: CanvasRenderingContext2D, maze: number[][], cellSize: number) => {
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     maze.forEach((row, i) => {
@@ -34,28 +39,20 @@ export default function Home() {
     const rows = 31;
     const router = useRouter();
     const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
-    const [maze, setMaze] = useState<number[][]>([]);
+    const [mazeData, setMazeData] = useState<number[][] | null>(null);
     const [isRunning, setIsRunning] = useState(false);
     const isRunningRef = useRef(isRunning);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         isRunningRef.current = isRunning;
     }, [isRunning]);
 
-    const fetchAndDrawMaze = async () => {
+    const fetchMaze = async () => {
         const response = await fetch(`http://localhost:3001/api/maze/generate-maze?width=${cols}&height=${rows}`);
         const data = await response.json() as number[][];
-        setMaze(data);
-
-        const canvas = canvasRef.current;
-        if (canvas) {
-            const ctx = canvas.getContext("2d");
-            if (ctx) {
-                const cellSize = Math.min(canvas.width / cols, canvas.height / rows);
-                drawMaze(ctx, data, cellSize);
-            }
-        }
+        setMazeData(data);
     };
 
     const handleLogout = () => {
@@ -74,18 +71,19 @@ export default function Home() {
             const response = await fetch("http://localhost:3001/api/compiler/execute", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ code, maze }),
+                body: JSON.stringify({ code, maze: mazeData }),
             });
-            const result = JSON.parse(await response.json()) as Position[];
+            const result = JSON.parse(await response.json()) as RunResult;
             setIsRunning(true);
             isRunningRef.current = true;
-            if (result.length > 0) {
-                autoStep(result, 1, maze.map(x => x.slice()));
+            if (result.steps.length > 0) {
+                autoStep(result,  1, mazeData!.map(x => x.slice()));
             }
         }
     };
 
-    const autoStep = (stepsArr: Position[], stepIdx: number, cur_maze: number[][]) => {
+    const autoStep = (result: RunResult, stepIdx: number, cur_maze: number[][]) => {
+        const stepsArr = result.steps;
         if (!isRunningRef.current || stepIdx >= stepsArr.length) {
             setIsRunning(false);
             return;
@@ -101,24 +99,22 @@ export default function Home() {
             const ctx = canvas.getContext("2d");
             if (ctx) {
                 const cellSize = Math.min(canvas.width / cols, canvas.height / rows);
-                drawMaze(ctx, maze, cellSize);
+                drawMaze(ctx, cur_maze, cellSize);
             }
         }
 
         if (stepIdx < stepsArr.length - 1 && isRunningRef.current) {
-            timerRef.current = setTimeout(() => autoStep(stepsArr, stepIdx + 1, cur_maze), 100);
+            timerRef.current = setTimeout(() => autoStep(result, stepIdx + 1, cur_maze), 100);
         } else {
-            console.log(maze[pos.y][pos.x]);
-            if(maze[pos.y][pos.x] !== 3) {
+            if(mazeData![pos.y][pos.x] !== 3) {
                 timerRef.current = setTimeout(() => stopProgram(), 1500);
             } else {
-                //TODO DISPLAY SUCCESS POPUP AND STOP THE PROGRAM AND DO FIREWORKS
-                createFirework();
+                createFirework(result);
             }
         }
     };
 
-    const createFirework = () => {
+    const createFirework = (result: RunResult) => {
         const canvas = document.createElement('canvas');
         canvas.className = 'firework';
         document.body.appendChild(canvas);
@@ -126,35 +122,50 @@ export default function Home() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        const particles: Array<{x: number, y: number, vx: number, vy: number, color: string}> = [];
-        const colors = ['#43e97b', '#2196f3', '#ff5858'];
+        const particles: Array<{x: number, y: number, vx: number, vy: number, color: string, size: number}> = [];
+        const colors = ['#43e97b', '#2196f3', '#ff5858', '#f09819', '#38f9d7'];
 
-        for (let i = 0; i < 100; i++) {
-            const angle = (Math.PI * 2 * i) / 50;
+        for (let i = 0; i < 2000; i++) {
+            const angle = (Math.PI * 2 * i) / 100;
+            const speed = Math.random() * 12 + 2;
             particles.push({
                 x: window.innerWidth / 2,
                 y: window.innerHeight / 2,
-                vx: Math.cos(angle) * (Math.random() * 8 + 1),
-                vy: Math.sin(angle) * (Math.random() * 8 + 1),
-                color: colors[Math.floor(Math.random() * colors.length)]
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                color: colors[Math.floor(Math.random() * colors.length)],
+                size: Math.random() * 5 + 2
             });
         }
 
         const popup = document.createElement('div');
         popup.className = 'success-popup';
-        popup.textContent = 'Success! Target reached! 🎉';
+        popup.innerHTML = `
+        <div style="position:relative;">
+            <button style="position:absolute; right:-20px; top:-20px; background:none; border:none; color:white; font-size:20px; cursor:pointer;">✕</button>
+            <h3 style="margin:0 0 10px 0;">Success! 🎉</h3>
+            <p style="margin:0;">You successfully reached the target in ${result.instruction_count} instructions!</p>
+        </div>
+    `;
         document.body.appendChild(popup);
 
+        const closeButton = popup.querySelector('button');
+        closeButton?.addEventListener('click', () => {
+            document.body.removeChild(canvas);
+            document.body.removeChild(popup);
+            stopProgram();
+        });
+
         const animate = () => {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
             particles.forEach(p => {
                 p.x += p.vx;
                 p.y += p.vy;
-                p.vy += 0.1;
+                p.vy += 0.08;
                 ctx.fillStyle = p.color;
-                ctx.fillRect(p.x, p.y, 3, 3);
+                ctx.fillRect(p.x, p.y, p.size, p.size);
             });
 
             if (canvas.style.opacity !== '0') {
@@ -163,12 +174,6 @@ export default function Home() {
         };
 
         animate();
-
-        setTimeout(() => {
-            document.body.removeChild(canvas);
-            document.body.removeChild(popup);
-            stopProgram();
-        }, 3000);
     };
 
     const stopProgram = () => {
@@ -182,25 +187,33 @@ export default function Home() {
             const ctx = canvas.getContext("2d");
             if (ctx) {
                 const cellSize = Math.min(canvas.width / cols, canvas.height / rows);
-                drawMaze(ctx, maze, cellSize);
+                drawMaze(ctx, mazeData!, cellSize);
             }
         }
     };
+
+    useEffect(() => {
+        if (mazeData && canvasRef.current) {
+            const canvas = canvasRef.current;
+            const ctx = canvas.getContext("2d");
+            if (ctx) {
+                const cellSize = Math.min(canvas.width / cols, canvas.height / rows);
+                drawMaze(ctx, mazeData, cellSize);
+            }
+        }
+    }, [mazeData]);
 
     useEffect(() => {
         const initializeApp = async () => {
             const token = localStorage.getItem("token");
             if (token) {
                 setIsLoggedIn(true);
-                await fetchAndDrawMaze();
-            } else {
-                setIsLoggedIn(false);
+                await fetchMaze();
             }
+            setIsLoading(false);
         };
 
-        (async () => {
-            await initializeApp();
-        })();
+        initializeApp();
 
         return () => {
             if (timerRef.current) {
@@ -208,6 +221,10 @@ export default function Home() {
             }
         };
     }, []);
+
+    if (isLoading) {
+        return null;
+    }
 
     return (
         <div id="main-layout">
@@ -222,7 +239,7 @@ export default function Home() {
                         <button className="sidebar-button logout-button" onClick={handleLogout}>
                             Logout
                         </button>
-                        <button className="sidebar-button generateButton" onClick={fetchAndDrawMaze}>
+                        <button className="sidebar-button generateButton" onClick={fetchMaze}>
                             Generate Maze
                         </button>
                         {isRunning ? (

@@ -10,6 +10,7 @@ export const compilerRouter = express.Router();
 
 compilerRouter.post('/execute', async (req, res) => {
   const code: string = req.body.code;
+
   const maze: number[][] = req.body.maze;
 
   const lexer = new Lexer(code);
