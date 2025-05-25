@@ -53,6 +53,11 @@ html, body {
     margin-bottom: 10px;
 }
 
+.sidebar-button:disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 #main {
     flex: 1;
     display: flex;

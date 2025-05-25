@@ -1,7 +1,7 @@
 "use client";
 
 import { Editor } from "@monaco-editor/react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import "./page.css";
 import { useRouter } from "next/navigation";
 import Login from "./components/Login/Login";
@@ -18,6 +18,11 @@ interface RunResult {
     steps: Position[];
     instruction_count: number;
     output: string;
+}
+
+interface GeneratorResponse{
+    maze: number[][];
+    seed: string;
 }
 
 const drawMaze = (ctx: CanvasRenderingContext2D, maze: number[][], cellSize: number) => {
@@ -45,17 +50,35 @@ export default function Home() {
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [consoleOutput, setConsoleOutput] = useState<string>("Console output will appear here...");
-
+    const [currentSeed, setCurrentSeed] = useState<string>("");
 
     useEffect(() => {
         isRunningRef.current = isRunning;
     }, [isRunning]);
 
-    const fetchMaze = async () => {
-        const response = await fetch(`http://localhost:3001/api/maze/generate-maze?width=${cols}&height=${rows}`);
-        const data = await response.json() as number[][];
-        setMazeData(data);
-    };
+    const initializeMaze = useCallback(async () => {
+        const url = `http://localhost:3001/api/maze/generate-maze?width=${cols}&height=${rows}`;
+        const response = await fetch(url);
+        const data = await response.json() as GeneratorResponse;
+        setMazeData(data.maze);
+        setCurrentSeed(data.seed);
+    }, [cols, rows]);
+
+    const fetchMaze = useCallback(async () => {
+        let url;
+        if (currentSeed.trim() === "") {
+            url = `http://localhost:3001/api/maze/generate-maze?width=${cols}&height=${rows}`;
+        } else {
+            url = `http://localhost:3001/api/maze/generate-maze-seed?width=${cols}&height=${rows}&seed=${currentSeed}`;
+        }
+
+        const response = await fetch(url);
+        const data = await response.json() as GeneratorResponse;
+        setMazeData(data.maze);
+        if (currentSeed.trim() === "") {
+            setCurrentSeed(data.seed);
+        }
+    }, [cols, rows, currentSeed]);
 
     const handleLogout = () => {
         localStorage.removeItem("token");
@@ -219,7 +242,7 @@ export default function Home() {
             const token = localStorage.getItem("token");
             if (token) {
                 setIsLoggedIn(true);
-                await fetchMaze();
+                await initializeMaze();
             }
             setIsLoading(false);
         };
@@ -231,7 +254,7 @@ export default function Home() {
                 clearTimeout(timerRef.current);
             }
         };
-    }, []);
+    }, [initializeMaze]);
 
     if (isLoading) {
         return null;
@@ -247,10 +270,20 @@ export default function Home() {
             ) : (
                 <div id="content">
                     <div id="sidebar">
-                        <button className="sidebar-button logout-button" onClick={handleLogout}>
+                        <button
+                            className="sidebar-button logout-button"
+                            onClick={handleLogout}
+                            disabled={isRunning}
+                            style={{ opacity: isRunning ? 0.5 : 1 }}
+                        >
                             Logout
                         </button>
-                        <button className="sidebar-button generateButton" onClick={fetchMaze}>
+                        <button
+                            className="sidebar-button generateButton"
+                            onClick={fetchMaze}
+                            disabled={isRunning}
+                            style={{ opacity: isRunning ? 0.5 : 1 }}
+                        >
                             Generate Maze
                         </button>
                         {isRunning ? (
@@ -258,7 +291,12 @@ export default function Home() {
                         ) : (
                             <button className="sidebar-button runButton" onClick={runProgram}>▶ Run Code</button>
                         )}
-                        <button className="sidebar-button leaderboardButton" onClick={() => router.push("/leaderboard")}>
+                        <button
+                            className="sidebar-button leaderboardButton"
+                            onClick={() => router.push("/leaderboard")}
+                            disabled={isRunning}
+                            style={{ opacity: isRunning ? 0.5 : 1 }}
+                        >
                             Leaderboard
                         </button>
                     </div>
@@ -277,7 +315,36 @@ export default function Home() {
                             />
                         </div>
                         <div className="card" id="maze-card">
-                            <h2 style={{margin: "0 0 12px 0", color: "#2196f3", fontWeight: 600}}>Maze</h2>
+                            <div style={{
+                                display: 'flex',
+                                width: '100%',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                marginBottom: '12px'
+                            }}>
+                                <h2 style={{ margin: 0, color: "#2196f3", fontWeight: 600 }}>Maze</h2>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                    <h2 style={{ margin: 0, color: "#2196f3", fontWeight: 600, fontSize: '1em' }}>
+                                        Seed:
+                                    </h2>
+                                    <input
+                                        type="text"
+                                        value={currentSeed}
+                                        onChange={(e) => setCurrentSeed(e.target.value)}
+                                        disabled={isRunning}
+                                        style={{
+                                            background: '#1a1d22',
+                                            border: '1px solid #2f353e',
+                                            borderRadius: '6px',
+                                            color: '#2196f3',
+                                            padding: '4px 8px',
+                                            fontSize: '1em',
+                                            fontWeight: 600,
+                                            width: '120px'
+                                        }}
+                                    />
+                                </div>
+                            </div>
                             <div id="maze-container">
                                 <canvas ref={canvasRef} width={500} height={500} />
                             </div>

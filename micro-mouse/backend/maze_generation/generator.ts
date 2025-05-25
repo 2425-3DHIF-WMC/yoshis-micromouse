@@ -1,14 +1,16 @@
-export function huntAndKill(width: number, height: number): number[][] {
+import Rand from 'rand-seed';
+
+
+export function huntAndKill(width: number, height: number, seed: string): number[][] {
 
   width -= width % 2;
   width++;
   height -= height % 2;
   height++;
 
-  //TODO: Implement Hunt & Kill algorithm
   let maze: number[][] = [];
   for (let i: number = 0; i < width; i++) {
-    maze.push([])                                   //Add width
+    maze.push([])                                  //Add width
     for (let j: number = 0; j < height; j++) {
       maze[i].push(1);                            //Fill with walls
     }
@@ -18,6 +20,8 @@ export function huntAndKill(width: number, height: number): number[][] {
   maze[15][15] = 0;        //Exit (none because micro mouse has to reach the middle)
 
   let currentlyOn: number[] = [1, 1];
+  const rand = new Rand(seed);
+
 
   while (!complete(maze)) {
     const neighbor = neighbors(maze, currentlyOn[0], currentlyOn[1]);
@@ -29,7 +33,7 @@ export function huntAndKill(width: number, height: number): number[][] {
       maze[(currentlyOn[0] + t[1][0]) / 2][(currentlyOn[1] + t[1][1]) / 2] = 0;
     }
     else {
-      let i: number = Math.floor(Math.random() * neighbor.length);
+      let i: number = Math.floor(rand.next() * neighbor.length);
       let nb: number[] = neighbor[i];
       maze[nb[0]][nb[1]] = 0;
       maze[(nb[0] + currentlyOn[0]) / 2][(nb[1] + currentlyOn[1]) / 2] = 0;
@@ -64,7 +68,6 @@ export function huntAndKill(width: number, height: number): number[][] {
 }
 function neighbors(maze: number[][], a: number, b: number): number[][] {
   let final: number[][] = [];
-  //TODO: Implement checker for the neighbors
   for (let i: number = 0; i < 4; i++) {
     let n: number[] = [a, b];
     n[i % 2] += ((Math.floor(i / 2) * 2) || -2);
@@ -82,7 +85,6 @@ function neighbors(maze: number[][], a: number, b: number): number[][] {
 }
 
 function neighborsAB(maze: number[][], a: number, b: number): number[][] {
-  //TODO: Implement method for coordinate checking (NOT the same as the method "neighbors"
   let final: number[][] = [];
   for (let i: number = 0; i < 4; i++) {             // Iterates through the 4 closest neighbors
     let n: number[] = [a, b];                   // (checks if they are reachable)
@@ -98,7 +100,6 @@ function neighborsAB(maze: number[][], a: number, b: number): number[][] {
 }
 
 function complete(maze: number[][]): boolean {
-  //TODO: Implement method for checking if the maze is "complete"
   for (let i: number = 1; i < maze.length; i += 2) {
     for (let j: number = 1; j < maze.length; j += 2) {
       if (maze[i][j] != 0) {
@@ -110,7 +111,6 @@ function complete(maze: number[][]): boolean {
 }
 
 function findCoordinate(maze: number[][]): number[][] {
-  //TODO: Implement method for finding the coordinates for neighbors (basically where to go)
   for (let i: number = 1; i < maze.length; i += 2) {
     for (let j: number = 1; j < maze.length; j += 2) {
       if (maze[i][j] == 1) {
