@@ -85,7 +85,7 @@ export default function Home() {
         }
     };
 
-    const autoStep = (stepsArr: Position[], stepIdx: number, maze: number[][]) => {
+    const autoStep = (stepsArr: Position[], stepIdx: number, cur_maze: number[][]) => {
         if (!isRunningRef.current || stepIdx >= stepsArr.length) {
             setIsRunning(false);
             return;
@@ -93,8 +93,8 @@ export default function Home() {
 
         const pos = stepsArr[stepIdx];
         const lastPos = stepsArr[stepIdx - 1];
-        maze[pos.y][pos.x] = 2;
-        maze[lastPos.y][lastPos.x] = 0;
+        cur_maze[pos.y][pos.x] = 2;
+        cur_maze[lastPos.y][lastPos.x] = 0;
 
         const canvas = canvasRef.current;
         if (canvas) {
@@ -106,10 +106,69 @@ export default function Home() {
         }
 
         if (stepIdx < stepsArr.length - 1 && isRunningRef.current) {
-            timerRef.current = setTimeout(() => autoStep(stepsArr, stepIdx + 1, maze), 1500);
+            timerRef.current = setTimeout(() => autoStep(stepsArr, stepIdx + 1, cur_maze), 100);
         } else {
-            timerRef.current = setTimeout(() => stopProgram(), 1500);
+            console.log(maze[pos.y][pos.x]);
+            if(maze[pos.y][pos.x] !== 3) {
+                timerRef.current = setTimeout(() => stopProgram(), 1500);
+            } else {
+                //TODO DISPLAY SUCCESS POPUP AND STOP THE PROGRAM AND DO FIREWORKS
+                createFirework();
+            }
         }
+    };
+
+    const createFirework = () => {
+        const canvas = document.createElement('canvas');
+        canvas.className = 'firework';
+        document.body.appendChild(canvas);
+        const ctx = canvas.getContext('2d')!;
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const particles: Array<{x: number, y: number, vx: number, vy: number, color: string}> = [];
+        const colors = ['#43e97b', '#2196f3', '#ff5858'];
+
+        for (let i = 0; i < 100; i++) {
+            const angle = (Math.PI * 2 * i) / 50;
+            particles.push({
+                x: window.innerWidth / 2,
+                y: window.innerHeight / 2,
+                vx: Math.cos(angle) * (Math.random() * 8 + 1),
+                vy: Math.sin(angle) * (Math.random() * 8 + 1),
+                color: colors[Math.floor(Math.random() * colors.length)]
+            });
+        }
+
+        const popup = document.createElement('div');
+        popup.className = 'success-popup';
+        popup.textContent = 'Success! Target reached! 🎉';
+        document.body.appendChild(popup);
+
+        const animate = () => {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.vy += 0.1;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x, p.y, 3, 3);
+            });
+
+            if (canvas.style.opacity !== '0') {
+                requestAnimationFrame(animate);
+            }
+        };
+
+        animate();
+
+        setTimeout(() => {
+            document.body.removeChild(canvas);
+            document.body.removeChild(popup);
+            stopProgram();
+        }, 3000);
     };
 
     const stopProgram = () => {
