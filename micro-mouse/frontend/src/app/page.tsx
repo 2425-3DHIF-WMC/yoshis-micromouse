@@ -1,3 +1,4 @@
+// src/app/page.tsx
 "use client";
 
 import { Editor } from "@monaco-editor/react";
@@ -18,9 +19,9 @@ const drawMaze = (ctx: CanvasRenderingContext2D, maze: number[][], cellSize: num
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     maze.forEach((row, i) => {
         row.forEach((cell, j) => {
-            ctx.fillStyle = cell === 1 ? "#fff" : "#000";
-            ctx.fillStyle = cell === 2 ? "#00ff00" : ctx.fillStyle;
-            ctx.fillStyle = cell === 3 ? "#f00" : ctx.fillStyle;
+            ctx.fillStyle = cell === 1 ? "#fff" : "#23272f";
+            ctx.fillStyle = cell === 2 ? "#43e97b" : ctx.fillStyle;
+            ctx.fillStyle = cell === 3 ? "#ff5858" : ctx.fillStyle;
             ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
         });
     });
@@ -70,18 +71,14 @@ export default function Home() {
     const runProgram = async () => {
         if (editorRef.current) {
             const code = editorRef.current.getValue();
-
             const response = await fetch("http://localhost:3001/api/compiler/execute", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ code, maze }),
             });
-
             const result = JSON.parse(await response.json()) as Position[];
             setIsRunning(true);
             isRunningRef.current = true;
-            console.log(result);
-
             if (result.length > 0) {
                 autoStep(result, 1, maze.map(x => x.slice()));
             }
@@ -132,13 +129,20 @@ export default function Home() {
     };
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            setIsLoggedIn(true);
-        } else {
-            setIsLoggedIn(false);
-        }
-        // Cleanup on unmount
+        const initializeApp = async () => {
+            const token = localStorage.getItem("token");
+            if (token) {
+                setIsLoggedIn(true);
+                await fetchAndDrawMaze();
+            } else {
+                setIsLoggedIn(false);
+            }
+        };
+
+        (async () => {
+            await initializeApp();
+        })();
+
         return () => {
             if (timerRef.current) {
                 clearTimeout(timerRef.current);
@@ -147,40 +151,47 @@ export default function Home() {
     }, []);
 
     return (
-        <div>
+        <div id="main-layout">
+            <div id="header">
+                <span>Micromouse</span>
+            </div>
             {!isLoggedIn ? (
                 <Login onLoginSuccess={() => setIsLoggedIn(true)} />
             ) : (
-                <div style={{ display: "flex", flexDirection: "row", height: "98vh" }}>
-                    <div style={{ position: "absolute", top: "10px", right: "10px" }}>
-                        <button onClick={handleLogout} className="logout-button">
+                <div id="content">
+                    <div id="sidebar">
+                        <button className="sidebar-button logout-button" onClick={handleLogout}>
                             Logout
                         </button>
+                        <button className="sidebar-button generateButton" onClick={fetchAndDrawMaze}>
+                            Generate Maze
+                        </button>
+                        {isRunning ? (
+                            <button className="sidebar-button runButton" onClick={stopProgram}>⏹ Stop</button>
+                        ) : (
+                            <button className="sidebar-button runButton" onClick={runProgram}>▶ Run Code</button>
+                        )}
+                        <button className="sidebar-button leaderboardButton" onClick={() => router.push("/leaderboard")}>
+                            Leaderboard
+                        </button>
                     </div>
-                    <div style={{ flex: 1, marginRight: "10px", overflow: "hidden" }}>
-                        <Editor
-                            height="100%"
-                            width="100%"
-                            defaultLanguage=""
-                            defaultValue="#Start coding here..."
-                            theme="vs-dark"
-                            onMount={(editor, monaco) => handleEditorMount(editor, monaco)}
-                        />
-                    </div>
-                    <div style={{ flex: 1, display: "flex", flexDirection: "column", height: "100%", overflow: "hidden" }}>
-                        <canvas ref={canvasRef} width={500} height={500} />
-                        <div style={{ flex: 1, display: "flex", flexDirection: "row", height: "100%", overflow: "hidden" }}>
-                            <button className="generateButton" onClick={fetchAndDrawMaze}>
-                                Neues Labyrinth generieren
-                            </button>
-                            {isRunning ? (
-                                <button className="runButton" onClick={stopProgram}>⏹ Stop</button>
-                            ) : (
-                                <button className="runButton" onClick={runProgram}>▶ Run Code</button>
-                            )}
-                            <button className="leaderboardButton" onClick={() => router.push("/leaderboard")}>
-                                Zum Leaderboard
-                            </button>
+                    <div id="main">
+                        <div className="card" id="editor-card">
+                            <h2 style={{color: "#43e97b", fontWeight: 600}}>Code Editor</h2>
+                            <Editor
+                                height="calc(100% - 60px)"
+                                width="100%"
+                                defaultLanguage=""
+                                defaultValue={`func void main() {
+    move_forward();
+}`}
+                                theme="vs-dark"
+                                onMount={(editor, monaco) => handleEditorMount(editor, monaco)}
+                            />
+                        </div>
+                        <div className="card" id="maze-card">
+                            <h2 style={{margin: "0 0 12px 0", color: "#2196f3", fontWeight: 600}}>Maze</h2>
+                            <canvas ref={canvasRef} width={500} height={500} />
                         </div>
                     </div>
                 </div>

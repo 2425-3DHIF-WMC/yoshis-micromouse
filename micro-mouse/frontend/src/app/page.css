@@ -1,55 +1,202 @@
-html {
-    overflow: hidden;
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #181c20;
+    color: #f5f6fa;
 }
 
-button {
-    color: white;
+#main-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#header {
+    background: #23272f;
+    padding: 18px 32px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #4CAF50;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+#content {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+}
+
+#sidebar {
+    width: 220px;
+    background: #23272f;
+    padding: 32px 16px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    box-shadow: 2px 0 8px rgba(0,0,0,0.04);
+}
+
+.sidebar-button {
+    width: 100%;
+    color: #fff;
     border: none;
     cursor: pointer;
-    width: 100%;
-    border-radius: 4px;
-    font-size: 16px;
+    border-radius: 6px;
+    font-size: 1rem;
+    padding: 12px 0;
+    font-weight: 500;
+    transition: background 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    margin-bottom: 10px;
 }
 
-.generateButton {
-    background-color: dodgerblue;
+#main {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    padding: 32px;
+    min-width: 0;
 }
 
-.generateButton:hover {
-    background-color: royalblue;
+.card {
+    background: #23272f;
+    border-radius: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
 }
 
-.runButton {
-    background-color: #4CAF50;
+#editor-card {
+    flex: 1.2;
+    min-width: 0;
+    margin-right: 0;
+    padding: 24px;
 }
 
-.runButton:hover {
-    background-color: #169d19;
+#editor-card h2 {
+    margin: 0 0 12px 0;
+    padding: 0;
 }
 
-.leaderboardButton {
-    background-color: red;
+
+.monaco-editor {
+    border-radius: 12px !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+}
+.monaco-editor .overflow-guard {
+    border-radius: 12px !important;
 }
 
-.leaderboardButton:hover {
-    background-color: darkred;
+.monaco-editor-background {
+    background-color: #1a1d22 !important;
+}
+
+.monaco-editor .margin {
+    background-color: #1a1d22 !important;
+}
+
+.monaco-editor .line-numbers {
+    color: #4b5563 !important;
+}
+
+.monaco-editor .minimap-slider {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.monaco-editor .editor-scrollable > .overflowingContentWidgets > .monaco-editor-overflowingcontentwidget {
+    display: none !important;
+}
+
+.monaco-scrollable-element > .scrollbar > .slider {
+    background: rgba(255, 255, 255, 0.1) !important;
+}
+
+.monaco-scrollable-element > .scrollbar > .slider:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+.monaco-scrollable-element > .scrollbar {
+    background-color: transparent !important;
+}
+
+.monaco-editor .minimap {
+    display: none !important;
+}
+
+#maze-card {
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    padding: 24px;
 }
 
 canvas {
-    width: 100vh;
-    height: 90vh;
+    width: 100%;
+    height: 400px;
+    background: #1a1d22;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    margin-bottom: 18px;
+    border: 1px solid #23272f;
+}
+
+.generateButton {
+    background: linear-gradient(90deg, #2196f3 60%, #21cbf3 100%);
+}
+
+.generateButton:hover {
+    background: linear-gradient(90deg, #1976d2 60%, #00bcd4 100%);
+}
+
+.runButton {
+    background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%);
+    color: #23272f;
+}
+
+.runButton:hover {
+    background: linear-gradient(90deg, #11998e 0%, #38ef7d 100%);
+    color: #fff;
+}
+
+.leaderboardButton {
+    background: linear-gradient(90deg, #ff5858 0%, #f09819 100%);
+}
+
+.leaderboardButton:hover {
+    background: linear-gradient(90deg, #d7263d 0%, #fbb034 100%);
 }
 
 .logout-button {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
+    background: linear-gradient(90deg, #ff4b68 0%, #ff7070 100%);
 }
 
 .logout-button:hover {
-    background-color: #d32f2f;
+    background: linear-gradient(90deg, #e63e5c 0%, #ff5757 100%);
+}
+
+@media (max-width: 900px) {
+    #main {
+        flex-direction: column;
+        gap: 18px;
+        padding: 16px;
+    }
+    #sidebar {
+        flex-direction: row;
+        width: 100%;
+        padding: 12px 8px;
+        gap: 8px;
+    }
+    #maze-card {
+        padding: 12px;
+    }
+    canvas {
+        height: 220px;
+    }
 }
