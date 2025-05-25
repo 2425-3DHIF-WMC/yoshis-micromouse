@@ -3,24 +3,41 @@ interface Instruction {
   args?: any[];
 }
 
+interface Position {
+  x: number;
+  y: number;
+  dir_x: number;
+  dir_y: number;
+}
+
 export class VirtualMachine {
   private stack: any[] = [];
   private variables: Map<string, any> = new Map();
   private functions: Map<string, number> = new Map();
   private callStack: number[] = [];
   private ip = 0;
-  private bytecode: Instruction[] = [];
+  private readonly bytecode: Instruction[] = [];
+  private instructionCount: number = 0;
+  private curPosition: Position = { x: 1, y: 0, dir_x: 0, dir_y: 1 };
+  private readonly visitedPositions: Position[] = [];
+  private readonly maze: number[][];
 
-  public run(bytecode: Instruction[]): void {
+  constructor(maze: number[][], bytecode: Instruction[]) {
+    this.maze = maze;
+    this.bytecode = bytecode;
+  }
+
+  public run(): Position[] {
     this.stack = [];
     this.variables = new Map();
     this.functions = new Map();
     this.callStack = [];
     this.ip = 0;
-    this.bytecode = bytecode;
 
-    for (let i = 0; i < bytecode.length; i++) {
-      const instr = bytecode[i];
+    this.visitedPositions.push(this.curPosition);
+
+    for (let i = 0; i < this.bytecode.length; i++) {
+      const instr = this.bytecode[i];
       if (instr.op === "FUNC") {
         this.functions.set(instr.args![0], i);
       }
@@ -33,9 +50,11 @@ export class VirtualMachine {
       const instr = this.bytecode[this.ip++];
       this.execute(instr);
     }
+    return this.visitedPositions;
   }
 
   private execute(instr: Instruction): void {
+    this.instructionCount++;
     switch (instr.op) {
       case "PUSH_INT":
       case "PUSH_FLOAT":
@@ -75,7 +94,6 @@ export class VirtualMachine {
         this.ip = this.functions.get(fname)! + 1;
         break;
       case "RET":
-        this.stack.pop();
         this.ip = this.callStack.pop()!;
         break;
       case "RET_VOID":
@@ -112,15 +130,23 @@ export class VirtualMachine {
 
   private builtin(name: string): boolean {
     if (name === "move_forward") {
-      console.log("Car moves forward");
+      if (this.maze[this.curPosition.y + this.curPosition.dir_y][this.curPosition.x + this.curPosition.dir_x] === 0) {
+        this.maze[this.curPosition.y][this.curPosition.x] = 0;
+        this.curPosition = { x: this.curPosition.x + this.curPosition.dir_x, y: this.curPosition.y + this.curPosition.dir_y, dir_x: this.curPosition.dir_x, dir_y: this.curPosition.dir_y };
+        this.visitedPositions.push(this.curPosition);
+        this.stack.push(1);
+      }
+      else {
+        this.stack.push(0);
+      }
       return true;
     }
     if (name === "turn_left") {
-      console.log("Car turns left");
+      this.curPosition = { x: this.curPosition.x, y: this.curPosition.y, dir_x: -this.curPosition.dir_y, dir_y: this.curPosition.dir_x };
       return true;
     }
     if (name === "turn_right") {
-      console.log("Car turns right");
+      this.curPosition = { x: this.curPosition.x, y: this.curPosition.y, dir_x: this.curPosition.dir_y, dir_y: -this.curPosition.dir_x };
       return true;
     }
     if (name === "print") {
@@ -128,8 +154,13 @@ export class VirtualMachine {
       console.log("Print:", val);
       return true;
     }
-    if(name === "wall_forward") {
-      console.log("Walls forward");
+    if (name === "is_wall") {
+      if (this.maze[this.curPosition.y + this.curPosition.dir_y][this.curPosition.x + this.curPosition.dir_x] === 1) {
+        this.stack.push(1);
+      }
+      else {
+        this.stack.push(0);
+      }
       return true;
     }
     return false;
