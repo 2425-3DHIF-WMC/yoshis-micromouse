@@ -85,10 +85,87 @@ export default function Home() {
         setIsLoggedIn(false);
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const handleEditorMount = (editor: monaco.editor.IStandaloneCodeEditor, monacoInstance: typeof monaco) => {
-        editorRef.current = editor;
-    };
+        const handleEditorMount = (editor: monaco.editor.IStandaloneCodeEditor, monacoInstance: typeof monaco) => {
+            editorRef.current = editor;
+
+
+            monacoInstance.languages.register({ id: "customLang" });
+
+
+            monacoInstance.languages.setMonarchTokensProvider("customLang", {
+                tokenizer: {
+                    root: [
+                        [/\b(func|if|while|return|int|float|bool|void|true|false)\b/, "keyword"],
+                        [/\b(move_forward|turn_left|turn_right|teleport|is_wall)\b/, "builtin"],
+                        [/\b\d+\.\d+\b/, "float"],
+                        [/\b\d+\b/, "integer"],
+                        [/\b[a-zA-Z][a-zA-Z0-9_]*\b/, "identifier"],
+                        [/(\|\||&&|==|!=|<=|>=|[<>+\-*\/%=!])/, "operator"],
+                        [/[{}[\](),;]/, "delimiter"],
+                        [/\/\/.*$/, "comment"],
+                        [/\/\*/, "comment", "@comment"],
+                        [/\s+/, "whitespace"],
+                    ],
+                    comment: [
+                        [/[^\/*]+/, "comment"],
+                        [/\*\//, "comment", "@pop"],
+                        [/[\/*]/, "comment"]
+                    ],
+                },
+            });
+
+            monacoInstance.languages.setLanguageConfiguration("customLang", {
+                comments: {
+                    lineComment: "//",
+                    blockComment: ["/*", "*/"]
+                },
+                brackets: [
+                    ["{", "}"],
+                    ["[", "]"],
+                    ["(", ")"]
+                ],
+                autoClosingPairs: [
+                    { open: "{", close: "}" },
+                    { open: "[", close: "]" },
+                    { open: "(", close: ")" },
+                    { open: '"', close: '"' },
+                    { open: "'", close: "'" }
+                ],
+                surroundingPairs: [
+                    { open: "{", close: "}" },
+                    { open: "[", close: "]" },
+                    { open: "(", close: ")" },
+                    { open: '"', close: '"' },
+                    { open: "'", close: "'" }
+                ]
+            });
+
+
+            monacoInstance.editor.defineTheme("micromouseTheme", {
+                base: "vs-dark",
+                inherit: true,
+                rules: [
+                    { token: "keyword", foreground: "#43e97b"},
+                    { token: "builtin", foreground: "#2196f3" },
+                    { token: "integer", foreground: "#f09819" },
+                    { token: "float", foreground: "#f09819" },
+                    { token: "identifier", foreground: "#21cbf3" },
+                    { token: "operator", foreground: "#ff5858" },
+                    { token: "delimiter", foreground: "#f5f6fa" },
+                    { token: "comment", foreground: "#6b7280" },
+                ],
+                colors: {
+                    "editor.background": "#1a1d22",
+                    "editor.foreground": "#f5f6fa",
+                    "editorCursor.foreground": "#43e97b",
+                    "editor.lineHighlightBackground": "#2f353e",
+                    "editor.selectionBackground": "#3a3f45",
+                    "editor.inactiveSelectionBackground": "#2f353e"
+                }
+            });
+
+            monacoInstance.editor.setTheme("micromouseTheme");
+        };
 
     const runProgram = async () => {
         if (editorRef.current) {
@@ -144,7 +221,7 @@ export default function Home() {
                 timerRef.current = setTimeout(() => stopProgram(), 1500);
             } else {
                 const token = localStorage.getItem("token");
-                const currentTime = new Date().toISOString().slice(0, 19); 
+                const currentTime = new Date().toISOString().slice(0, 19);
 
                 await fetch("http://localhost:3001/api/leaderboard/add-score", {
                     method: "POST",
@@ -323,7 +400,7 @@ export default function Home() {
                             <Editor
                                 height="calc(100% - 60px)"
                                 width="100%"
-                                defaultLanguage=""
+                                defaultLanguage="customLang"
                                 defaultValue={`func void main() {
     move_forward();
 }`}
