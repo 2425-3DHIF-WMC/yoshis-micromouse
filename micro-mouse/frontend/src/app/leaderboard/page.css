@@ -1,47 +1,98 @@
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #23272f;
+    color: #f5f6fa;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    color: #4CAF50;
+    letter-spacing: 1px;
+    text-align: center;
+    justify-content: center;
+}
+
 .leaderboard-container {
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px;
+    background: #23272f;
     min-height: 100vh;
-    padding-bottom: 50px;
+    gap: 16px;
 }
 
 .leaderboard-table {
     margin: 0 auto;
     border-collapse: collapse;
-    width: 50%;
+    width: 95%;
+    background: #23272f;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
 }
 
 .leaderboard-table th,
 .leaderboard-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
+    border: 1px solid #4b5563;
+    padding: 12px;
+    text-align: center;
+    color: #f5f6fa;
 }
 
 .leaderboard-table th {
-    background-color: #4CAF50;
-    color: white;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.leaderboard-table tr:nth-child(even) {
+    background-color: #1a1d22;
+}
+
+.leaderboard-table tr:hover {
+    background-color: #2a2e35;
+}
+
+.current-user {
+    background-color: dodgerblue;
+    font-weight: bold;
+    color: #fff;
 }
 
 .current-user-table {
     margin: 0 auto;
     border-collapse: collapse;
-    width: 50%;
-    left: 25%;
+    width: 60%;
+    background: #23272f;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12);
     position: fixed;
-    bottom: 0;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .current-user-table th,
 .current-user-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
+    border: 1px solid #4b5563;
+    padding: 12px;
+    text-align: center;
+    color: #f5f6fa;
 }
 
 .current-user-table th {
     background-color: dodgerblue;
-    color: white;
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.1rem;
 }
 
-.current-user {
-    background-color: dodgerblue; /* Gelber Hintergrund */
-    font-weight: bold;
+.leaderboard-table-container {
+    padding-top: 3%;
+    padding-bottom: 3%;
+    width: 65%;
+    background: #181c20;
+    border-radius: 12px;
 }

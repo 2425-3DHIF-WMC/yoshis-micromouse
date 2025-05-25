@@ -32,6 +32,7 @@ export default function Page() {
     return (
         <div className="leaderboard-container">
             <h1>Leaderboard</h1>
+            <div className="leaderboard-table-container">
             <table className="leaderboard-table">
                 <thead>
                 <tr>
@@ -53,6 +54,7 @@ export default function Page() {
                 ))}
                 </tbody>
             </table>
+            </div>
             <table className="current-user-table">
                 <thead>
                 <tr>
