@@ -116,7 +116,7 @@ export default function Home() {
         }
     };
 
-    const autoStep = (result: RunResult, stepIdx: number, cur_maze: number[][]) => {
+    const autoStep = async (result: RunResult, stepIdx: number, cur_maze: number[][]) => {
         const stepsArr = result.steps;
         if (!isRunningRef.current || stepIdx >= stepsArr.length) {
             setIsRunning(false);
@@ -143,6 +143,23 @@ export default function Home() {
             if(mazeData![pos.y][pos.x] !== 3) {
                 timerRef.current = setTimeout(() => stopProgram(), 1500);
             } else {
+                const token = localStorage.getItem("token");
+                const currentTime = new Date().toISOString().slice(0, 19); 
+
+                await fetch("http://localhost:3001/api/leaderboard/add-score", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        username: localStorage.getItem("username"),
+                        instructionCount: result.instruction_count,
+                        seed: currentSeed,
+                        time: currentTime
+                    })
+                });
+
                 createFirework(result);
             }
         }

@@ -102,42 +102,38 @@ loginRouter.get('/scores', async (req, res) => {
     const service = new UserService(unit);
     const scores = await service.getScores();
 
-    if (scores) {
-      res.status(StatusCodes.OK).json(scores);
-    } else {
-      res.status(StatusCodes.NOT_FOUND).json({ error: "kein Benutzer" });
-    }
+    res.status(StatusCodes.OK).json(scores);
   } catch (e) {
     console.error(e);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Ein Fehler ist aufgetreten." });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send();
   } finally {
     await unit.complete();
   }
 });
 
-loginRouter.post('/update-score', async (req, res) => {
-  const { username, timeInMilliseconds } = req.body;
+loginRouter.post('/add-score', async (req, res) => {
+  const { username, instructionCount, seed, time } = req.body;
 
-  if (!username || timeInMilliseconds === undefined) {
-    return res.status(StatusCodes.BAD_REQUEST).json({ error: "Benutzername und Zeit in Millisekunden sind erforderlich." });
+  if (!username || isNaN(instructionCount) || !seed || !time) {
+    return res.status(StatusCodes.BAD_REQUEST).send();
   }
 
   const unit = await Unit.create(false);
 
   try {
     const service = new UserService(unit);
-    const success = await service.updateScore(username, timeInMilliseconds);
+    const success = await service.addScore({ username, instructionCount, seed, time });
 
     if (success) {
       await unit.complete(true);
-      res.status(StatusCodes.OK).json({ message: "Score erfolgreich aktualisiert." });
+      res.status(StatusCodes.NO_CONTENT).send();
     } else {
       await unit.complete(false);
-      res.status(StatusCodes.CONFLICT).json({ error: "Score wurde nicht aktualisiert." });
+      res.status(StatusCodes.BAD_REQUEST).send();
     }
   } catch (e) {
     console.error(e);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ error: "Ein Fehler ist aufgetreten." });
+    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send();
   } finally {
     await unit.complete(false);
   }

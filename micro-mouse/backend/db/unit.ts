@@ -86,9 +86,19 @@ export class DB {
     await connection.run(
       `CREATE TABLE IF NOT EXISTS Users (
                     username TEXT PRIMARY KEY,
-                    passwordHash TEXT NOT NULL,
-                    score INTEGER DEFAULT 0
+                    passwordHash TEXT NOT NULL
                  ) STRICT`
     );
+
+    await connection.run(
+      `CREATE TABLE IF NOT EXISTS RECORDS (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    username TEXT NOT NULL,
+                    instructionCount INTEGER,
+                    seed TEXT,
+                    time TEXT,
+                    FOREIGN KEY (username) REFERENCES Users(username)
+                    ) STRICT`
+    )
   }
 }

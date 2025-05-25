@@ -3,6 +3,7 @@ import { Unit } from "../db/unit";
 import * as bcrypt from "bcrypt";
 import { IScore, IUser } from "../model";
 
+
 export class UserService extends ServiceBase {
   constructor(unit: Unit) {
     super(unit);
@@ -27,35 +28,14 @@ export class UserService extends ServiceBase {
   }
 
   public async getScores(): Promise<IScore[]> {
-    const stmt = await this.unit.prepare('select username, score from Users order by score desc, username');
-    const rows = await stmt.all();
-
-    return rows.map((row: { score: any; username: any; }) => {
-      const totalTime = row.score;
-      const minutes = Math.floor(totalTime / 60000);
-      const seconds = Math.floor((totalTime % 60000) / 1000);
-      const milliseconds = totalTime % 1000;
-
-      return {
-        username: row.username,
-        score: `${minutes}:${seconds.toString().padStart(2, '0')}.${milliseconds.toString().padStart(3, '0')}`
-      }
-    });
+    const stmt = await this.unit.prepare('select username, instructionCount, seed, time from RECORDS');
+    const rows = await stmt.all() as IScore[];
+    return rows;
   }
 
-  public async updateScore(username: string, timeInMilliseconds: number): Promise<boolean> {
-    const stmt = await this.unit.prepare('SELECT score FROM Users WHERE username = ?', username);
-    const currentScore = ServiceBase.unwrapSingle<number>(await stmt.get(), 'score');
-
-    if (currentScore !== null && currentScore <= timeInMilliseconds) {
-      return false;
-    }
-
-    const updateStmt = await this.unit.prepare(
-      `UPDATE Users SET score = ? WHERE username = ?`,
-      [timeInMilliseconds, username]
-    );
-    const [success, _] = await this.executeStmt(updateStmt);
+  public async addScore(score: IScore): Promise<boolean> {
+    const stmt = await this.unit.prepare('INSERT INTO RECORDS (username, instructionCount, seed, time) values (?, ?, ?, ?)', [score.username, score.instructionCount, score.seed, score.time]);
+    const [success, _] = await this.executeStmt(stmt);
     return success;
   }
 

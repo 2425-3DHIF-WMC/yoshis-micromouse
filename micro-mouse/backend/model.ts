@@ -1,10 +1,13 @@
 export interface IUser {
-    username: string;
-    passwordHash: string;
-    score: number;
+  username: string;
+  passwordHash: string;
 }
 
+
 export interface IScore {
-    username: string;
-    score: string;
+  username: string;
+  instructionCount: number;
+  seed: string;
+  time: string;
 }
+
