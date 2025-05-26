@@ -96,7 +96,7 @@ export default function Home() {
                 tokenizer: {
                     root: [
                         [/\b(func|if|while|return|int|float|bool|void|true|false)\b/, "keyword"],
-                        [/\b(move_forward|turn_left|turn_right|teleport|is_wall)\b/, "builtin"],
+                        [/\b(move_forward|turn_left|turn_right|teleport|is_wall|next_wall)\b/, "builtin"],
                         [/\b\d+\.\d+\b/, "float"],
                         [/\b\d+\b/, "integer"],
                         [/\b[a-zA-Z][a-zA-Z0-9_]*\b/, "identifier"],

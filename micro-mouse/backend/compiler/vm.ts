@@ -1,3 +1,5 @@
+import { dir } from "node:console";
+
 interface Instruction {
   op: string;
   args?: any[];
@@ -178,6 +180,17 @@ export class VirtualMachine {
       const y = this.stack.pop()!;
       this.curPosition = { x: x, y: y, dir_x: this.curPosition.dir_x, dir_y: this.curPosition.dir_y };
       this.visitedPositions.push(this.curPosition);
+      return true;
+    }
+    if (name === "next_wall") {
+      const tmpPos = { ...this.curPosition };
+      let i = 0;
+      while (this.maze[tmpPos.y + tmpPos.dir_y][tmpPos.x + tmpPos.dir_x] !== 1) {
+        tmpPos.x += tmpPos.dir_x;
+        tmpPos.y += tmpPos.dir_y;
+        i++;
+      }
+      this.stack.push(i);
       return true;
     }
     return false;

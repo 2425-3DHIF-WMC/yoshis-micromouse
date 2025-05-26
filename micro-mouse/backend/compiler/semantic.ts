@@ -26,6 +26,7 @@ export class SemanticAnalyzer {
     this.functions.set('is_wall', { returnType: 'bool', paramTypes: [] });
     this.functions.set('completed', { returnType: 'bool', paramTypes: [] });
     this.functions.set('teleport', { returnType: 'void', paramTypes: ['int', 'int'] });
+    this.functions.set('next_wall', { returnType: 'int', paramTypes: [] });
 
     for (const stmt of program.body) {
       this.checkStatement(stmt);
