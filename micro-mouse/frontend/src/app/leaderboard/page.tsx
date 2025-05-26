@@ -55,6 +55,7 @@ export default function Leaderboard() {
         };
 
         fetchScores();
+        document.title = "Micromouse - Leaderboard";
     }, [router]);
 
     useEffect(() => {

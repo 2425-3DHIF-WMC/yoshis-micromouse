@@ -342,6 +342,7 @@ export default function Home() {
         };
 
         initializeApp();
+        document.title = "Micromouse";
 
         return () => {
             if (timerRef.current) {
